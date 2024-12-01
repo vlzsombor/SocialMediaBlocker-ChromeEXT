@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Procrastination Blocker",
   "version": "0.1.1",
   "content_scripts": [
@@ -9,13 +9,15 @@
     }
   ],
   "icons": { "48": "icon48.png", "128": "icon128.png" },
-  "browser_action": {
+  "action": {
     "default_popup": "Popup.html",
     "default_title": "Procrastination Blocker"
   },
-  "permissions": [
+  "host_permissions": [
+    "*://*/*",
     "https://www.youtube.com/*",
     "https://www.facebook.com/*",
     "https://www.netflix.com/*"
-  ]
+  ],
+  "permissions": ["storage"]
 }
