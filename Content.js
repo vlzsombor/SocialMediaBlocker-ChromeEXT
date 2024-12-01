@@ -1,6 +1,6 @@
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-const meditation_duration_in_sec = 20;
-const meditation_timeout_duration = 10;
+const meditation_duration_in_sec = 30; //6 * 60 + 5;
+const meditation_timeout_duration = 10; // 2 * 60 * 60;
 
 const readLocalStorage = async (key) => {
   return new Promise((resolve, reject) => {
@@ -22,8 +22,6 @@ const yourFunction = async () => {
     return;
   }
 
-  var originalHead = document.head.innerHTML;
-  var originalBody = document.body.innerHTML;
   console.time("Execution Time");
 
   var block_until = await readLocalStorage("block_until");
@@ -39,31 +37,27 @@ const yourFunction = async () => {
   document.body.innerHTML = generateHTML("all in");
 
   await new Promise((resolve) => {
+    countdownTimer(block_until - Date.now());
 
-    countdownTimer(block_until - Date.now())
-    
     const x = setInterval(() => {
       if (document.getElementById("demo") == null) {
         clearInterval(x);
-        resolve()
+        resolve();
       }
-      
+
       var distance = block_until - Date.now();
 
-      countdownTimer(distance)
+      countdownTimer(distance);
       // If the count down is over, write some text
 
       if (distance < 0) {
         clearInterval(x);
-        resolve()
+        resolve();
       }
     }, 1000);
-
   });
 
-  document.head.innerHTML = originalHead;
-  document.body.innerHTML = originalBody;
-
+  location.reload();
   chrome.storage.local.set({ next_meditation_epoch: Date.now() }).then(() => {
     console.log("Value is set");
   });
@@ -85,29 +79,20 @@ async function waitUntil(condition) {
   });
 }
 
-
-
-function countdownTimer(distance){
-  
-  if(distance<0){
+function countdownTimer(distance) {
+  if (distance < 0) {
     document.getElementById("demo").innerHTML = "EXPIRED";
     return;
   }
-  
+
   var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-  var hours = Math.floor(
-    (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-  );
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
   var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-
-
 
   // Output the result in an element with id="demo"
   document.getElementById("demo").innerHTML =
     days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
-
 }
 
 main();
@@ -124,19 +109,35 @@ const generateHTML = (pageName) => {
       <div class="cloud x5"></div>
   </div>
   <div class='c'>
-      <div class='_404'>404</div>
+      <div class='_1'>Two hours passed since the last meditation.</div>
+      <div class='_1'>Time to meditate:</div>
+
+      <div id="demo" class='_404'/>
       <hr>
-      <div class='_1'>GET BACK TO WORK</div>
       <div class='_2'>STUDYING > ${pageName}</div>
+      <hr>
+      <br>
   </div>
 
-  <p id="demo"></p>
+<div><iframe width="560" height="315" 
+  src="https://www.youtube.com/embed/MCgTDLtxJzQ"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  allowfullscreen></iframe> </div>
+
 
    `;
 };
-
 const generateSTYLES = () => {
   return `<style>@import url(https://fonts.googleapis.com/css?family=opensans:500);
+
+  p {
+    text-align: center;
+    font-size: 60px;
+    margin-top: 0px;
+  }
+
   body {
     background: #33cc99;
     color: #fff;
@@ -152,6 +153,8 @@ const generateSTYLES = () => {
     margin: 100px auto;
   }
   ._404 {
+    color: black;
+
     font-size: 220px;
     position: relative;
     display: inline-block;
@@ -160,6 +163,8 @@ const generateSTYLES = () => {
     letter-spacing: 15px;
   }
   ._1 {
+    color: black;
+
     text-align: center;
     display: block;
     position: relative;
