@@ -1,6 +1,6 @@
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-const meditation_duration_in_sec = 30; //6 * 60 + 5;
-const meditation_timeout_duration = 10; // 2 * 60 * 60;
+const meditation_duration_in_sec = 6 * 60 + 5;
+const meditation_timeout_duration = 2 * 60 * 60;
 
 const readLocalStorage = async (key) => {
   return new Promise((resolve, reject) => {
