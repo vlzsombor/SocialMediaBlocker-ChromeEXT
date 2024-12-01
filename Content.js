@@ -1,7 +1,6 @@
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-const meditation_duration_in_sec = 1 * 5
-const meditation_timeout_duration = 10
-
+const meditation_duration_in_sec = 20;
+const meditation_timeout_duration = 10;
 
 const readLocalStorage = async (key) => {
   return new Promise((resolve, reject) => {
@@ -14,79 +13,101 @@ const readLocalStorage = async (key) => {
 const yourFunction = async () => {
   let next_meditation_epoch = await readLocalStorage("next_meditation_epoch");
 
-  if (next_meditation_epoch != null && Math.floor(Date.now() - next_meditation_epoch) / 1000 < meditation_timeout_duration) {
+  if (
+    next_meditation_epoch != null &&
+    Math.floor(Date.now() - next_meditation_epoch) / 1000 <
+      meditation_timeout_duration
+  ) {
     console.log("Less than 2 hours have passed. you dont have to meditate");
     return;
   }
 
   var originalHead = document.head.innerHTML;
   var originalBody = document.body.innerHTML;
+  console.time("Execution Time");
+
+  var block_until = await readLocalStorage("block_until");
+
+  if (block_until != null) {
+    //await delay(block_until - Date.now());
+  } else {
+    var block_until = Date.now() + meditation_duration_in_sec * 1000;
+    chrome.storage.local.set({ block_until: block_until });
+    //await delay(meditation_duration_in_sec * 1000);
+  }
   document.head.innerHTML = generateSTYLES();
   document.body.innerHTML = generateHTML("all in");
 
-  var countDownDate = new Date("Jan 5, 2030 15:37:25").getTime();
+  await new Promise((resolve) => {
 
-  var block_until = await readLocalStorage("block_until")
+    countdownTimer(block_until - Date.now())
+    
+    const x = setInterval(() => {
+      if (document.getElementById("demo") == null) {
+        clearInterval(x);
+        resolve()
+      }
+      
+      var distance = block_until - Date.now();
 
-  if(block_until != null){
-    await delay(block_until - Date.now());
-  } else {
-    var block_until = Date.now() + meditation_duration_in_sec * 1000
-    chrome.storage.local.set({ block_until: block_until })
-    await delay(meditation_duration_in_sec * 1000);
-  }
-  chrome.storage.local.set({ next_meditation_epoch: Date.now() }).then(() => {
-    console.log("Value is set");
+      countdownTimer(distance)
+      // If the count down is over, write some text
+
+      if (distance < 0) {
+        clearInterval(x);
+        resolve()
+      }
+    }, 1000);
+
   });
-
-  // Update the count down every 1 second
-  var x = setInterval(function () {
-    // Get today's date and time
-    var now = new Date().getTime();
-
-    // Find the distance between now and the count down date
-    var distance = countDownDate - now;
-
-    // Time calculations for days, hours, minutes and seconds
-    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    var hours = Math.floor(
-      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-    );
-    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    // Output the result in an element with id="demo"
-    if(document.getElementById("demo") == null){
-      clearInterval(x);
-    }
-
-    document.getElementById("demo").innerHTML =
-      days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
-
-    // If the count down is over, write some text
-    if (distance < 0) {
-      clearInterval(x);
-      document.getElementById("demo").innerHTML = "EXPIRED";
-    }
-  }, 1000);
-
-  await x;
-
-
-
-
-
 
   document.head.innerHTML = originalHead;
   document.body.innerHTML = originalBody;
 
-  chrome.storage.local.remove('block_until')
-
+  chrome.storage.local.set({ next_meditation_epoch: Date.now() }).then(() => {
+    console.log("Value is set");
+  });
+  chrome.storage.local.remove("block_until");
   return;
-  location.reload();
 };
 async function main() {
   await yourFunction();
+}
+
+async function waitUntil(condition) {
+  return await new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (condition) {
+        resolve("foo");
+        clearInterval(interval);
+      }
+    }, 1000);
+  });
+}
+
+
+
+function countdownTimer(distance){
+  
+  if(distance<0){
+    document.getElementById("demo").innerHTML = "EXPIRED";
+    return;
+  }
+  
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor(
+    (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+  );
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+
+
+
+  // Output the result in an element with id="demo"
+  document.getElementById("demo").innerHTML =
+    days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+
 }
 
 main();
