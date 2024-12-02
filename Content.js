@@ -1,6 +1,6 @@
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-const meditation_duration_in_sec = 6 * 60 + 5;
-const meditation_timeout_duration = 2 * 60 * 60;
+const meditation_duration_in_sec = 10 // 6 * 60 + 5;
+const meditation_timeout_duration = 10 // 2 * 60 * 60;
 
 const readLocalStorage = async (key) => {
   return new Promise((resolve, reject) => {
@@ -9,7 +9,7 @@ const readLocalStorage = async (key) => {
     });
   });
 };
-
+var timeInterval
 
 const yourFunction = async () => {
   let last_meditation_epoch = await readLocalStorage("last_meditation_epoch");
@@ -50,14 +50,14 @@ const yourFunction = async () => {
   document.head.innerHTML = generateSTYLES();
   document.body.innerHTML = generateHTML("all in");
 
-
+  document.getElementById("skip-button").addEventListener("click", skip);
 
   await new Promise((resolve) => {
     countdownTimer(block_until - Date.now());
 
-    const x = setInterval(() => {
+    timeInterval = setInterval(() => {
       if (document.getElementById("demo") == null) {
-        clearInterval(x);
+        clearInterval(timeInterval);
         resolve();
       }
 
@@ -67,15 +67,11 @@ const yourFunction = async () => {
       // If the count down is over, write some text
 
       if (distance < 0) {
-        clearInterval(x);
+        clearInterval(timeInterval);
         resolve();
       }
     }, 1000);
   });
-
-  if (autoRefresh) {
-    location.reload();
-  }
 
   chrome.storage.local.set({ last_meditation_epoch: Date.now() }).then(() => {
     console.log("Value is set");
@@ -97,7 +93,15 @@ async function waitUntil(condition) {
     }, 1000);
   });
 }
-
+function skip(){
+  console.log("skip")
+  clearInterval(timeInterval);
+  chrome.storage.local.set({ last_meditation_epoch: Date.now() }).then(() => {
+    console.log("Value is set");
+  });
+  chrome.storage.local.remove("block_until");
+  location.reload();
+}
 function countdownTimer(distance) {
   if (distance < 0) {
     //document.getElementById("demo").innerHTML = "EXPIRED";
@@ -152,10 +156,12 @@ const generateHTML = (pageName) => {
      
      <h1>
       <button id="refresh-button" href="#" onClick="window.location.reload();" class="btn btn-info btn-lg" />
-      <span class="glyphicon glyphicon-refresh"></span> Refresh
-    </a>
-</h1>
-
+        <span class="glyphicon glyphicon-refresh"></span> Refresh
+    </h1>
+    <h1>
+    <button id="skip-button" href="#" class="btn btn-info btn-lg" />
+      <span class="glyphicon glyphicon-refresh"></span> Skip for now
+    </h1>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
