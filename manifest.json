@@ -8,9 +8,9 @@
       "js": ["Content.js"]
     }
   ],
-  "icons": { "48": "icon48.png", "128": "icon128.png" },
+  "icons": { "32": "icon32.png", "128": "icon128.png" },
   "action": {
-    "default_popup": "Popup.html",
+    "default_popup": "popup.html",
     "default_title": "Procrastination Blocker"
   },
   "host_permissions": [

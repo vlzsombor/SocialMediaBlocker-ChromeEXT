@@ -1,6 +1,8 @@
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-const meditation_duration_in_sec = 6 * 60 + 5;
-const meditation_timeout_duration = 1 * 60 * 60;
+const meditation_duration_const = 10 * 1000//(6 * 60 + 5) * 1000 
+const meditation_timeout_duration_const = 10 * 1000 //1 * 60 * 60 * 1000;
+const youtube_url_const = "https://youtu.be/L8cvGhmWNqY"
+
 
 const readLocalStorage = async (key) => {
   return new Promise((resolve, reject) => {
@@ -12,11 +14,43 @@ const readLocalStorage = async (key) => {
 var timeInterval
 
 const yourFunction = async () => {
+  
+  function youtube_parser(url){
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    var match = url.match(regExp);
+    return (match&&match[7].length==11)? match[7] : false;
+  }
+  
+  
+  
   let last_meditation_epoch = await readLocalStorage("last_meditation_epoch");
 
+  let meditation_duration = await readLocalStorage("meditation_duration_in_min") * 60 * 1000;
+  let meditation_timeout_duration = await readLocalStorage("meditation_break_time_in_min")* 60 * 1000;
+  let youtube_url = await readLocalStorage("youtube_url");
+
+
+  if(meditation_duration == null){
+    meditation_duration = meditation_duration_const
+  }
+
+  
+  if(meditation_timeout_duration == null){
+    meditation_timeout_duration = meditation_timeout_duration_const
+  }
+
+  if(youtube_url == null){
+    youtube_url = youtube_url_const
+  }
+
+
+
+
+
+  
   if (
     last_meditation_epoch != null &&
-    Math.floor(Date.now() - last_meditation_epoch) / 1000 <
+    Math.floor(Date.now() - last_meditation_epoch) <
       meditation_timeout_duration
   ) {
     console.log("Less than 2 hours have passed. you dont have to meditate");
@@ -29,7 +63,7 @@ const yourFunction = async () => {
     console.log(
       "Next meditation date:" +
         new Date(
-          last_meditation_epoch + meditation_timeout_duration * 1000
+          last_meditation_epoch + meditation_timeout_duration
         ).toString()
     );
 
@@ -43,7 +77,7 @@ const yourFunction = async () => {
 
   if (block_until == null) {
     console.log("Block until is being assigned:")
-    var block_until = Date.now() + meditation_duration_in_sec * 1000;
+    var block_until = Date.now() + meditation_duration;
     chrome.storage.local.set({ block_until: block_until });
   }
   console.log("Block until " + new Date(block_until) + " Epoch " + block_until.toString())
@@ -51,8 +85,15 @@ const yourFunction = async () => {
   document.head.innerHTML = generateSTYLES();
   document.body.innerHTML = generateHTML("all in");
 
+
+
+
   document.getElementById("skip-button").addEventListener("click", skip);
   document.getElementById("refresh-button").addEventListener("click", refresh);
+  
+  
+  
+  document.getElementById('youtubeIframe').src = "https://www.youtube.com/embed/" + youtube_parser(youtube_url);
 
   await new Promise((resolve) => {
     countdownTimer(block_until - Date.now());
@@ -139,8 +180,6 @@ const generateHTML = (pageName) => {
       <div class="cloud x5"></div>
   </div>
   <div class='c'>
-
-      <div class='_1'>Two hours passed since the last meditation.</div>
       <div class='_1'>Time to meditate:</div>
 
       <div id="demo" class='_404'/>
@@ -152,7 +191,9 @@ const generateHTML = (pageName) => {
   </div>
 
 
-      <div><iframe width="560" height="315" 
+      <div><iframe
+      id="youtubeIframe"
+      width="560" height="315" 
       src="https://www.youtube.com/embed/MCgTDLtxJzQ"
       title="YouTube video player"
       frameborder="0"

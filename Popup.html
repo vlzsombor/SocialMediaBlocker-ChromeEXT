@@ -2,17 +2,17 @@
 <html>
   <head> </head>
   <body>
-    <div class="main">
-      <h1>Stop Procastinating</h1>
-      <hr />
-      <span>
-        Current Blocked Sites:
-        <span style="color: #ff0100;">Youtube</span>
-        |
-        <span style="color: #0e8ef2;">Facebook</span>
-        |
-        <span style="color: #e50914;">Netflix</span>
-      </span>
-    </div>
+    <div style="padding: 20px 20px 20px 20px;">
+      <label for="meditation_duration_in_min">Duration of one meditation session (minutes)</label>     
+      <input id="meditation_duration_in_min" type="number" value="5" />
+      <label for="meditation_break_time_in_min">Time period until the websites blocked again (minutes)</label>     
+      <input id="meditation_break_time_in_min" type="number" value="120" />
+      <label for="youtube_url">Embedded youtube video to meditate to</label>     
+      <input id="youtube_url" type="text" value="https://youtu.be/FyhaUqkfEDY" />
+
+      <button id="ok_btn" type="button">OK</button>
+  </div>
   </body>
+  <script src="popup.js"></script>     
+
 </html>
