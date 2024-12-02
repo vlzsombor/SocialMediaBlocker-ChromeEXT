@@ -10,15 +10,29 @@ const readLocalStorage = async (key) => {
   });
 };
 
+
 const yourFunction = async () => {
-  let next_meditation_epoch = await readLocalStorage("next_meditation_epoch");
+  let last_meditation_epoch = await readLocalStorage("last_meditation_epoch");
 
   if (
-    next_meditation_epoch != null &&
-    Math.floor(Date.now() - next_meditation_epoch) / 1000 <
+    last_meditation_epoch != null &&
+    Math.floor(Date.now() - last_meditation_epoch) / 1000 <
       meditation_timeout_duration
   ) {
     console.log("Less than 2 hours have passed. you dont have to meditate");
+    console.log(
+      "Last meditation epoch " +
+        last_meditation_epoch.toString() +
+        " date:" +
+        new Date(last_meditation_epoch).toString()
+    );
+    console.log(
+      "Next meditation date:" +
+        new Date(
+          last_meditation_epoch + meditation_timeout_duration * 1000
+        ).toString()
+    );
+
     return;
   }
 
@@ -35,6 +49,8 @@ const yourFunction = async () => {
   }
   document.head.innerHTML = generateSTYLES();
   document.body.innerHTML = generateHTML("all in");
+
+
 
   await new Promise((resolve) => {
     countdownTimer(block_until - Date.now());
@@ -57,8 +73,11 @@ const yourFunction = async () => {
     }, 1000);
   });
 
-  location.reload();
-  chrome.storage.local.set({ next_meditation_epoch: Date.now() }).then(() => {
+  if (autoRefresh) {
+    location.reload();
+  }
+
+  chrome.storage.local.set({ last_meditation_epoch: Date.now() }).then(() => {
     console.log("Value is set");
   });
   chrome.storage.local.remove("block_until");
@@ -81,7 +100,7 @@ async function waitUntil(condition) {
 
 function countdownTimer(distance) {
   if (distance < 0) {
-    document.getElementById("demo").innerHTML = "EXPIRED";
+    //document.getElementById("demo").innerHTML = "EXPIRED";
     return;
   }
 
@@ -99,7 +118,7 @@ main();
 
 const generateHTML = (pageName) => {
   return `
-   
+
    <div id="clouds">
       <div class="cloud x1"></div>
       <div class="cloud x1_5"></div>
@@ -109,28 +128,48 @@ const generateHTML = (pageName) => {
       <div class="cloud x5"></div>
   </div>
   <div class='c'>
+
       <div class='_1'>Two hours passed since the last meditation.</div>
       <div class='_1'>Time to meditate:</div>
 
       <div id="demo" class='_404'/>
       <hr>
       <div class='_2'>STUDYING > ${pageName}</div>
-      <hr>
+        <hr>
       <br>
+
   </div>
 
-<div><iframe width="560" height="315" 
-  src="https://www.youtube.com/embed/MCgTDLtxJzQ"
-  title="YouTube video player"
-  frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-  allowfullscreen></iframe> </div>
+
+      <div><iframe width="560" height="315" 
+      src="https://www.youtube.com/embed/MCgTDLtxJzQ"
+      title="YouTube video player"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen></iframe></div>
+     
+     
+     
+     <h1>
+      <button id="refresh-button" href="#" onClick="window.location.reload();" class="btn btn-info btn-lg" />
+      <span class="glyphicon glyphicon-refresh"></span> Refresh
+    </a>
+</h1>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
 
    `;
 };
 const generateSTYLES = () => {
-  return `<style>@import url(https://fonts.googleapis.com/css?family=opensans:500);
+  return `
+  
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  
+  <style>@import url(https://fonts.googleapis.com/css?family=opensans:500);
 
   p {
     text-align: center;
