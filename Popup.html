@@ -1,18 +1,54 @@
 <!DOCTYPE html>
 <html>
-  <head> </head>
-  <body>
-    <div style="padding: 20px 20px 20px 20px;">
-      <label for="meditation_duration_in_min">Duration of one meditation session (minutes)</label>     
-      <input id="meditation_duration_in_min" type="number" value="5" />
-      <label for="meditation_break_time_in_min">Time period until the websites blocked again (minutes)</label>     
-      <input id="meditation_break_time_in_min" type="number" value="120" />
-      <label for="youtube_url">Embedded youtube video to meditate to</label>     
-      <input id="youtube_url" type="text" value="https://youtu.be/FyhaUqkfEDY" />
 
-      <button id="ok_btn" type="button">OK</button>
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="mx-auto" style="width: 350px;">
+
+    <div class="container">
+      <div class="row justify-content-md-center">
+        <div class="col-sm">
+
+          <form>
+            <div class="form-group">
+              <label for="meditation_duration_in_min">Duration of meditation in minutes</label>
+              <div class="row d-flex justify-content-center">
+                <input id="meditation_duration_in_min" type="number" value="5" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="meditation_break_time_in_min">Minutes until the next meditation occures</label>
+              <div class="row d-flex justify-content-center">
+                <input id="meditation_break_time_in_min" type="number" value="120" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="youtube_url">Embedded youtube video to meditate to</label>
+              <div class="row d-flex justify-content-center">
+                <input id="youtube_url" type="text" value="https://youtu.be/FyhaUqkfEDY" />
+              </div>
+            </div>
+            <div class="row d-flex justify-content-center py-2">
+              <button id="ok_btn" type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
-  </body>
-  <script src="popup.js"></script>     
+</body>
+<script src="popup.js"></script>
+<style>
+  html {
+    width: 400px;
+    /* max: 800px */
+    height: 200px;
+    /* max: 600px */
+  }
+</style>
 
 </html>
