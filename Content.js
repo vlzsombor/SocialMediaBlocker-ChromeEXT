@@ -1,6 +1,6 @@
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-const meditation_duration_in_sec = 10 // 6 * 60 + 5;
-const meditation_timeout_duration = 10 // 2 * 60 * 60;
+const meditation_duration_in_sec = 6 * 60 + 5;
+const meditation_timeout_duration = 2 * 60 * 60;
 
 const readLocalStorage = async (key) => {
   return new Promise((resolve, reject) => {
@@ -94,13 +94,13 @@ async function waitUntil(condition) {
   });
 }
 function skip(){
+  location.reload();
   console.log("skip")
   clearInterval(timeInterval);
   chrome.storage.local.set({ last_meditation_epoch: Date.now() }).then(() => {
     console.log("Value is set");
   });
   chrome.storage.local.remove("block_until");
-  location.reload();
 }
 function countdownTimer(distance) {
   if (distance < 0) {
