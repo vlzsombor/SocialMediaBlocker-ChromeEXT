@@ -1,6 +1,6 @@
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 const meditation_duration_in_sec = 6 * 60 + 5;
-const meditation_timeout_duration = 2 * 60 * 60;
+const meditation_timeout_duration = 1 * 60 * 60;
 
 const readLocalStorage = async (key) => {
   return new Promise((resolve, reject) => {
@@ -36,21 +36,23 @@ const yourFunction = async () => {
     return;
   }
 
-  console.time("Execution Time");
+  console.log("Execution: ")
+  console.log(new Date())
 
   var block_until = await readLocalStorage("block_until");
 
-  if (block_until != null) {
-    //await delay(block_until - Date.now());
-  } else {
+  if (block_until == null) {
+    console.log("Block until is being assigned:")
     var block_until = Date.now() + meditation_duration_in_sec * 1000;
     chrome.storage.local.set({ block_until: block_until });
-    //await delay(meditation_duration_in_sec * 1000);
   }
+  console.log("Block until " + new Date(block_until) + " Epoch " + block_until.toString())
+
   document.head.innerHTML = generateSTYLES();
   document.body.innerHTML = generateHTML("all in");
 
   document.getElementById("skip-button").addEventListener("click", skip);
+  document.getElementById("refresh-button").addEventListener("click", refresh);
 
   await new Promise((resolve) => {
     countdownTimer(block_until - Date.now());
@@ -72,6 +74,7 @@ const yourFunction = async () => {
       }
     }, 1000);
   });
+  console.log("Finished")
 
   chrome.storage.local.set({ last_meditation_epoch: Date.now() }).then(() => {
     console.log("Value is set");
@@ -101,6 +104,10 @@ function skip(){
     console.log("Value is set");
   });
   chrome.storage.local.remove("block_until");
+}
+function refresh(){
+  location.reload();
+  console.log("refresh")
 }
 function countdownTimer(distance) {
   if (distance < 0) {
@@ -165,8 +172,6 @@ const generateHTML = (pageName) => {
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-
-
    `;
 };
 const generateSTYLES = () => {
@@ -417,3 +422,5 @@ const generateSTYLES = () => {
   }
    </style>`;
 };
+
+
