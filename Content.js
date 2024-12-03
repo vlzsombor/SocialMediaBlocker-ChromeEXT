@@ -116,6 +116,7 @@ const yourFunction = async () => {
     }, 1000);
   });
   console.log("Finished")
+  document.getElementById("refresh-button").disabled = false;
 
   chrome.storage.local.set({ last_meditation_epoch: Date.now() }).then(() => {
     console.log("Value is set");
@@ -123,6 +124,9 @@ const yourFunction = async () => {
   chrome.storage.local.remove("block_until");
   return;
 };
+
+
+
 async function main() {
   await yourFunction();
 }
@@ -138,6 +142,10 @@ async function waitUntil(condition) {
   });
 }
 function skip(){
+  let result = confirm("Are you sure?");
+  if(!result){
+    return;
+  }
   location.reload();
   console.log("skip")
   clearInterval(timeInterval);
@@ -203,11 +211,11 @@ const generateHTML = (pageName) => {
      
      
      <h1>
-      <button id="refresh-button" href="#" onClick="window.location.reload();" class="btn btn-info btn-lg" />
-        <span class="glyphicon glyphicon-refresh"></span> Refresh
+      <button id="refresh-button" href="#" onClick="window.location.reload();" class="btn btn-warning btn-lg" disabled/>
+        <span class="glyphicon glyphicon-refresh"></span> Continue to work
     </h1>
     <h1>
-    <button id="skip-button" href="#" class="btn btn-info btn-lg" />
+    <button id="skip-button" href="#" class="btn btn-danger btn-lg btn" />
       <span class="glyphicon glyphicon-refresh"></span> Skip for now
     </h1>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
